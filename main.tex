@@ -1,0 +1,57 @@
+%!TEX aux_directory = aux
+%!TEX output_directory = aux
+\documentclass[11pt]{article}
+
+% Style file options
+%   - []: enable editions macros
+%   - [final]: remove edition macros
+\usepackage[]{TGstyle}
+
+% ------ Metadata ------ %
+
+\title{Template paper}
+\author{Theo Guyard \\ \small{Affiliation}}
+\date{\today}
+
+% ------ Headings ------ %
+
+\input{headings/packages}
+\input{headings/macros}
+\input{headings/glossaries}
+\usepackage{kmath}
+
+% ------ Edition macros ------ %
+
+\ProvideEditionMacros{TG}{blue}
+
+% ------ Document ------ %
+
+\begin{document} 
+
+\maketitle
+
+\lipsum[1]
+
+\begin{equation}
+    \tag{$\ppb$}
+    \textstyle
+    \min_{\pv \in \kR^{\pdim}} \lfunc(\pv)
+\end{equation}
+
+\gls{mip}
+\citep{bauschke2017convex}
+\AddTG{Blablabla}
+\RemTG{Blablabla}
+\SupTG{Blablabla}
+\AddTodo{Blablabla}
+
+\begin{proposition}
+    \label{prop:prop}
+    Blablabla
+\end{proposition}
+
+\Cref{prop:prop} tells blablabla.
+
+\bibliography{main}
+
+\end{document}z

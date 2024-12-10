@@ -1,0 +1,54 @@
+% Encoding
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+% Colors
+\usepackage[dvipsnames]{xcolor}
+\definecolor{mycolor}{RGB}{41,128,185}
+
+% Glossaries
+\usepackage{glossaries}
+\glsdisablehyper
+
+% Text
+\usepackage[hidelinks]{hyperref}
+\hypersetup{
+  colorlinks=true,
+  linkcolor=BrickRed,
+  urlcolor=NavyBlue,
+  citecolor=NavyBlue,
+}
+\usepackage{cleveref}
+\usepackage{lipsum}
+\usepackage{enumitem}
+\usepackage{comment}
+
+% Math formatting
+\usepackage{amsmath}
+\usepackage{stmaryrd}
+
+% Graphics
+\usepackage{booktabs}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=newest}
+\usepackage[ruled]{algorithm2e}
+
+% Bibliography
+\usepackage[numbers,sort]{natbib}
+\bibliographystyle{abbrvnat}
+
+% Theorem environments
+\newtheorem{assumption}{Assumption}
+\newtheorem{definition}{Definition}
+\newtheorem{corollary}{Corollary}
+\newtheorem{example}{Example}
+\newtheorem{hypothesis}{Hypothesis}
+\newtheorem{lemma}{Lemma}
+\newtheorem{proposition}{Proposition}
+\newtheorem{remark}{Remark}
+\newtheorem{theorem}{Theorem}
+
+% Crefnames
+\crefname{assumption}{assumption}{assumptions}
+\Crefname{assumption}{Assumption}{Assumptions}
