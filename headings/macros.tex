@@ -1,23 +1,54 @@
 % Problems
-\newcommand{\ppb}{\mathcal{P}}
+\newcommand{\ppb}{P}
+\newcommand{\rpb}{R}
 
 % Objective values and functions
 \newcommand{\pobj}{p}
+\newcommand{\robj}{r}
 
 % Variables
 \newcommand{\pvletter}{x}
 \newcommand{\pv}{\mathbf{\pvletter}}
 \newcommand{\pvi}[1]{\pvletter_{#1}}
+\newcommand{\bvletter}{z}
+\newcommand{\bv}{\mathbf{\bvletter}}
+\newcommand{\bvi}[1]{\bvletter_{#1}}
+\newcommand{\dvletter}{u}
+\newcommand{\dv}{\mathbf{\dvletter}}
+\newcommand{\dvi}[1]{\dvletter_{#1}}
 
 % Sets
-\newcommand{\pset}{\mathcal{X}}
 
 % Problem data
 \newcommand{\pdim}{n}
 \newcommand{\lfunc}{f}
+\newcommand{\pfunc}{h}
+\newcommand{\rfunc}{g}
+\newcommand{\dfunc}{D}
+\newcommand{\reg}{\lambda}
+\newcommand{\pslope}{\tau}
+\newcommand{\plimit}{\mu}
 
 % Indices
 \newcommand{\idxentry}{i}
+
+% BnB
+\newcommand{\LB}[1]{\check{#1}}
+\newcommand{\UB}[1]{\hat{#1}}
+\newcommand{\nodesymbol}{\nu}
+\newcommand{\node}[1]{#1^\nodesymbol}
+\newcommand{\childzero}[2]{#1_{#2,0}}
+\newcommand{\childone}[2]{#1_{#2,1}}
+\newcommand{\setidx}{\nodesymbol}
+\newcommand{\setzero}{\setidx_0}
+\newcommand{\setone}{\setidx_1}
+\newcommand{\setnone}{\setidx_\bullet}
+\newcommand{\pivotzero}[1]{\Delta_{#1,0}}
+\newcommand{\pivotone}[1]{\Delta_{#1,1}}
+
+\newcommand{\ggfunc}{\Omega}
+\newcommand{\gpfunc}{\omega}
+
 
 % Math operators
 \DeclareMathOperator{\argmin}{argmin}

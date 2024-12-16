@@ -9,8 +9,8 @@
 
 % ------ Metadata ------ %
 
-\title{Template paper}
-\author{Theo Guyard \\ \small{Affiliation}}
+\title{Thesis Manuscript Summary}
+\author{Théo Guyard \\ \small{Insa and Inria Rennes}}
 \date{\today}
 
 % ------ Headings ------ %
@@ -29,29 +29,219 @@
 \begin{document} 
 
 \maketitle
+\vspace*{-30pt}
 
-\lipsum[1]
-
+The manuscript focuses on $\ell_0$-regularized optimization problems expressed as
 \begin{equation}
+    \label{prob:prob}
     \tag{$\ppb$}
     \textstyle
-    \min_{\pv \in \kR^{\pdim}} \lfunc(\pv)
+    \opt{\pobj} = \min_{\pv \in \kR^{\pdim}} \lfunc(\pv) + \reg\norm{\pv}{0} + \pfunc(\pv)
 \end{equation}
+where $\kfuncdef{\lfunc}{\kR^{\pdim}}{\kR \cup \{+\infty\}}$ is a loss function, the notation $\norm{\cdot}{0}$ stands for the $\ell_0$-norm which counts the number of non-zeros in its input to promote sparse solutions, and $\kfuncdef{\pfunc}{\kR^{\pdim}}{\kR \cup \{+\infty\}}$ is a penalty function used to promote other properties than sparsity.
+This family of problems is of paramount interest in various fields such as signal processing, machine learning, or statistics, among many others \citep{tillmann2021cardinality}.
+For instance, problem \eqref{prob:prob} allows to construct sparse linear regressors in compressed sensing applications \citep{tropp2010computational} and its solutions correspond to maximum \textit{a posteriori} estimators of  Bernoulli-Gaussian signals \citep{soussen2011bernoulli}.
 
-\gls{mip}
-\citep{bauschke2017convex}
-\AddTG{Blablabla}
-\RemTG{Blablabla}
-\SupTG{Blablabla}
-\AddTodo{Blablabla}
+Problem \eqref{prob:prob} can be cast into the \gls{mip} formalism and tackled using generic solvers \citep{bourguignon2015exact}.
+However, the latter often achieve poor numerical performance since they are not able to exploit the sparse structure of the problem.
+Hence, recent work directions have rather focused on designing specialized \gls{bnb} algorithms to achieve more reasonable solving times \citep{ben2022global,hazimeh2022sparse}.
+From \Cref{sec:bnb,sec:contributions,sec:numerics}, we describe the main ingredients of \gls{bnb} algorithms tailored to problem \eqref{prob:prob}, outline the contributions presented in the manuscript for these methods, and give a glimpse of the implication of our work for signal processing applications.
 
-\begin{proposition}
-    \label{prop:prop}
-    Blablabla
-\end{proposition}
 
-\Cref{prop:prop} tells blablabla.
+
+\section{Branch-and-Bound Algorithms}
+\label{sec:bnb}
+
+A \gls{bnb} algorithm is a general paradigm to address global optimization problems.
+It explores different \emph{regions} in the feasible space and \emph{prunes} those that cannot contain global solutions.
+When applied to problem \eqref{prob:prob}, the \gls{bnb} algorithm starts from the whole feasible space $\kR^{\pdim}$ and create regions by driving the sparsity of the optimization variable, that is by fixing some entries to zero or non-zero.
+Therefore, regions explored are defined as
+\begin{equation}
+    \label{eq:region}
+    \nodesymbol = \left\{
+        \pv \in \kR^{\pdim}
+        \left|
+        \begin{array}{ll}
+            \pvi{\idxentry} = 0 &\forall \idxentry \in \setzero \\
+            \pvi{\idxentry} \neq 0 &\forall \idxentry \in \setone \\
+            \pvi{\idxentry} \in \kR &\forall \idxentry \in \setnone
+        \end{array}
+        \right.
+    \right\}
+\end{equation}
+where $(\setzero,\setone,\setnone)$ corresponds to a partition of $\{1,\dots,\pdim\}$.
+Tailored rules can be implemented to select index to fix and the next region to process during the \gls{bnb} algorithm \citep{samain2023techniques}.
+
+\paragraph{Region processing.}
+The central mechanism of the \gls{bnb} algorithm is to detect when a given region $\nodesymbol$ explored cannot contain solutions to problem \eqref{prob:prob} via a \emph{pruning test}.
+Letting 
+\begin{equation}
+    \label{prob:prob-node}
+    \tag{$\node{\ppb}$}
+    \textstyle
+    \node{\pobj} = \min_{\pv \in \nodesymbol} \lfunc(\pv) + \reg\norm{\pv}{0} + \pfunc(\pv)
+    ,
+\end{equation}
+one can observe that no solutions can be contained in $\nodesymbol$ when $\node{\pobj} > \opt{\pobj}$ and the region can then be discarded from the problem's feasible space.
+Since, evaluating this inequality is a complicated task in practice, one rather implements a pruning test expressed as
+\begin{equation}
+    \label{eq:pruning-test}
+    \node{\LB{\pobj}} > \opt{\UB{\pobj}}
+\end{equation}
+for some bounds $\node{\LB{\pobj}} \leq \node{\pobj}$ and $\opt{\UB{\pobj}} \geq \opt{\pobj}$.
+Implementing the \gls{bnb} algorithm then mainly amounts to devising strategies to compute these bounds, typically sought tight and tractable to ensure the efficiency of the pruning test.
+
+\paragraph{Bounds evaluation.}
+Various heuristic-based strategies allow to obtain some upper bound $\opt{\UB{\pobj}}$ on $\opt{\pobj}$ of good quality at a reasonable cost.
+The real challenge lies in the computation of a lower bound $\node{\LB{\pobj}}$ for each region $\nodesymbol$ explored during the \gls{bnb} algorithm.
+This task is usually achieved by solving a \emph{relaxation} of problem \eqref{prob:prob-node} expressed as
+\begin{equation}
+    \label{prob:relax-node}
+    \tag{$\node{\rpb}$}
+    \textstyle
+    \node{\robj} = \min_{\pv \in \kR^{\pdim}} \lfunc(\pv) + \node{\LB{\rfunc}}(\pv)
+\end{equation}
+for some $\kfuncdef{\node{\LB{\rfunc}}}{\kR^{\pdim}}{\kR \cup \{+\infty\}}$.
+The latter function must verify $\node{\LB{\rfunc}}(\pv) \leq \reg\norm{\pv}{0} + \pfunc(\pv)$ for all $\pv \in \nodesymbol$ to ensure that setting $\node{\LB{\pobj}} = \node{\robj}$ leads to a valid pruning test \eqref{eq:pruning-test}.
+Moreover, one usually wants to construct $\node{\LB{\rfunc}}$ \emph{convex} to obtain a tractable relaxation \eqref{prob:relax-node}.
+Several strategies have been proposed in the literature to design $\node{\LB{\rfunc}}$ depending on the expression of $\pfunc$ \citep{ben2022global,hazimeh2022sparse}.
+
+\paragraph{Bottlenecks.}
+\gls{bnb} algorithms proposed in the literature suffer from two main issues.
+\begin{enumerate}[label=\arabic*., nosep]
+    \item First, they are designed for a specific choice of function $\pfunc$ in the objective of problem \eqref{prob:prob}, thereby restricting their scope of application. This limitation is mainly due to the lack of generic methodology to construct the function $\node{\LB{\rfunc}}$ in the relaxation \eqref{prob:relax-node}, independently of the expression of $\pfunc$.
+    \item Second, they can still suffer from poor numerical performance on some real-world instances of problem \eqref{prob:prob}. Specially, their solving time can be expressed as 
+    \begin{equation}
+        \label{eq:complexity}
+        \textstyle
+        T = \sum_{\nodesymbol \in N} t_{\nodesymbol}
+    \end{equation}
+    where $N$ corresponds to the set of all regions processed during the \gls{bnb} algorithm and $t_{\nodesymbol}$ corresponds to the time needed to process a given region $\nodesymbol \in N$. In practice, the cardinality of $N$ can be large and since processing each region requires solving a relaxation \eqref{prob:relax-node}, this can result in prohibitive solving times.
+\end{enumerate}
+The manuscript proposes theoretical and practical contributions to these challenges.
+
+
+\section{Contributions}
+\label{sec:contributions}
+
+In the following, we outline the main contributions of the manuscript.
+
+\subsection{Generalizing the \gls{bnb} Algorithm}
+\label{sec:contributions:generic}
+
+The first contribution introduces a generic strategy for constructing the relaxation \eqref{prob:relax-node} within the \gls{bnb} algorithm.
+Our approach only necessitates mild assumptions and does not depend on a specific expression of the function $\pfunc$.
+It mainly stems from the following result.
+\begin{theorem}
+    \label{thm:biconj}
+    Let $\ggfunc(\pvi{}) = \reg\norm{\pvi{}}{0} + \gpfunc(\pvi{})$ where $\pvi{} \in \kR$, $\reg > 0$ and $\kfuncdef{\gpfunc}{\kR}{\kR \cup \{+\infty\}}$ is a proper, closed, convex, even, and supercoercive function verifying $\gpfunc \geq \gpfunc(0) = 0$ with $0 \in \interior\dom(\gpfunc)$.
+    Then, the convex envelope of $\ggfunc$ is given by
+    \begin{equation}
+        \biconj{\ggfunc}(\pvi{}) = 
+        \begin{cases}
+            \pslope \abs{\pvi{}} &\text{if } \abs{\pvi{}} \leq \plimit \\
+            \gpfunc(\pvi{}) + \reg &\text{otherwise}
+        \end{cases}
+    \end{equation}
+    with $\pslope = \sup\kset{\bvi{} \in \kR}{\conj{\gpfunc}(\bvi{}) \leq \reg}$, $\plimit = \sup\kset{\bvi{} \in \kR}{\bvi{} \in \subdiff\conj{\gpfunc}(\pslope)}$, and where $\conj{\gpfunc}$ denotes the convex conjugate of $\gpfunc$.
+\end{theorem}
+As a byproduct of \Cref{thm:biconj}, we provide a principled manner for constructing the function $\node{\LB{\rfunc}}$ in the relaxation \eqref{prob:relax-node}, independent of the expression of $\pfunc$. Notably, this strategy encompasses prior results from the literature and generalizes them to a broader framework.
+Beyond this generic method for constructing relaxations, we also characterize various operators associated with the function $\node{\LB{\rfunc}}$ and essential for implementing solution methods tailored to problem \eqref{prob:relax-node}.
+Overall, this contribution gives a generic backbone for a \gls{bnb} algorithm capable of addressing a wide range of instances of problem \eqref{prob:prob}.
+
+\subsection{Accelerating the Relaxation Processing}
+
+Our second contribution aims at reducing the processing time $t_{\nodesymbol}$ per region in \eqref{eq:complexity} to improve the \gls{bnb} algorithm efficiency.
+To do so, we propose an efficient numerical procedure to address the relaxations \eqref{prob:relax-node} constructed during the \gls{bnb} algorithms which correspond to convex optimization problems.
+In particular, we have adapted a coordinate-descent method to tackle problem \eqref{prob:relax-node}, which turns out to be a particularly efficient choice in our context.
+This method is also enhanced via acceleration strategies based on working-sets and screening tests to further reduce the relaxation processing time.
+The resulting numerical procedure allows to address each relaxation constructed during the \gls{bnb} algorithms efficiently
+
+
+\subsection{Reducing the Number of Regions Processed}
+
+Our third contribution aims at reducing the number $N$ of regions explored in \eqref{eq:complexity} to improve the \gls{bnb} algorithm efficiency.
+To do so, we first show that 
+\begin{equation}
+    \label{eq:dual-bound}
+    \node{\pobj} \geq \node{\dfunc}(\dv)
+\end{equation}
+for all $\dv \in \kR^{\pdim}$, where $\node{\dfunc}$ corresponds to the objective function of the Fenchel-Rockafellar problem associated to \eqref{prob:relax-node} for which we provide a closed-form expression.
+Inequality \eqref{eq:dual-bound} allows to implement the pruning test \eqref{eq:pruning-test} with $\node{\LB{\pobj}} = \node{\dfunc}(\dv)$.
+Such \emph{dual} lower-bound have already been exploited in the literature to \AddTodo{XXX}.
+We have proposed a novel strategy to further exploit these bounds to reduce the 
+
+
+With such bounds, one need not solve a relaxation \eqref{prob:relax-node} but only to evaluate a function to assess whether a region can be pruned.
+However, the quality of the resulting pruning test is potentially degraded.
+
+
+
+that can be implemented in the pruning test \eqref{eq:pruning-test}.
+
+\begin{itemize}
+    \item Dual bounds
+    
+    where stems from Fenchel-Rockafellar.
+    \begin{theorem}
+        \label{thm:simpruning}
+        \begin{subequations}
+            \begin{align}
+                \dfunc^{\childzero{\nodesymbol}{\idxentry}}(\dv) &= \node{\dfunc}(\dv) + \pivotzero{\idxentry}(\dv) \\
+                \dfunc^{\childone{\nodesymbol}{\idxentry}}(\dv) &= \node{\dfunc}(\dv) + \pivotone{\idxentry}(\dv)
+            \end{align}
+        \end{subequations}
+        where \AddTodo{blabla}
+    \end{theorem}
+    \item The relation highlighted in \Cref{thm:simpruning} can be exploited to reduce the number of regions processed during the \gls{bnb} algorithm at a low computational cost. While processing a given region $\nodesymbol$, one can evaluate a pruning test \eqref{eq:pruning-test} for a nested region $\nodesymbol' \subseteq \nodesymbol$ that has not been explored using a dual bound. The latter can be efficiently computed from the relation \eqref{eq:dual-bound}.
+    \item This is particularily efficient because \AddTodo{blablabla}
+\end{itemize}
+
+
+\subsection{A Practical Solver}
+
+Our contributions are implemented in \texttt{el0ps}, a Python package available online at
+\begin{center}
+\url{https://github.com/TheoGuyard/El0ps}
+\end{center}
+which provides a framework for constructing and solving instances of problem \eqref{prob:prob}.
+It includes several build-in instances and offers users the flexibility to create custom ones by specifying the expressions for the functions $\lfunc$ and $\pfunc$ of interest for their applications, along with some associated operators (sub-differential, proximal operator, etc...).
+Once a problem instance has been defined, it can be automatically processed using a \gls{bnb} algorithm.
+Experimental results demonstrate that our solver achieves state-of-the-art performance, with acceleration factors ranging from one to several orders of magnitude in terms of solving times compared to its best competitors.
+
+
+\section{Numerical illustrations}
+\label{sec:numerics}
+
 
 \bibliography{main}
 
-\end{document}z
+\clearpage
+
+\thispagestyle{empty}
+
+\vspace*{150pt}
+\begin{center}
+    \LARGE\bf{Lettre de Candidature}
+\end{center}
+\vspace*{50pt}
+\begin{flushright}
+    À Rennes, le 16 décembre 2024
+\end{flushright}
+\vspace*{20pt}
+\textbf{Objet:} Candidature au prix de thèse 2025 du GRETSI
+
+\vspace*{20pt}
+
+Par cette présente lettre, je souhaiterais soumettre ma candidature au prix de thèse 2025 du GRETSI pour mon manuscrit intitulé \textit{Branch-and-Bound Algorithms for L0-Regularized Optimization Problems} réalisé sous la direction de M. Cédric Herzet.
+Je certifie que les critères de recevabilité de ma candidature sont respectés et m'engage à fournir tous les documents nécessaires à l'examen de mon dossier.
+~\\
+
+Veuillez agréer, Madame, Monsieur, l'expression de mes salutations distinguées.
+
+\vspace*{50pt}
+\begin{flushright}
+    Théo Guyard
+\end{flushright}
+
+\end{document}

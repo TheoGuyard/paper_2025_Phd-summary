@@ -180,10 +180,10 @@
       \parindent 1em\noindent
       \hbox to 1.8em{\hss $\m@th ^{\@thefnmark}$}##1
     }
-    \thispagestyle{empty}
+    % \thispagestyle{empty}
     \@maketitle
-    \@thanks
-    \@notice
+    % \@thanks
+    % \@notice
   \endgroup
   \let\maketitle\relax
   \let\thanks\relax
@@ -213,10 +213,10 @@
     \hsize\textwidth
     \linewidth\hsize
     \vskip 0.1in
-    \@toptitlebar
+    % \@toptitlebar
     \centering
     {\LARGE\bf \@title\par}
-    \@bottomtitlebar
+    % \@bottomtitlebar
     \def\And{%
       \end{tabular}\hfil\linebreak[0]\hfil%
       \begin{tabular}[t]{c}\bf\rule{\z@}{24\p@}\ignorespaces%
@@ -237,14 +237,14 @@
 }
 
 % Notice to bottom of first page
-\newcommand{\@noticestring}{Last update : \today.}
-\newcommand{\ftype@noticebox}{8}
-\newcommand{\@notice}{%
-  \enlargethispage{2\baselineskip}%
-  \@float{noticebox}[b]%
-    \footnotesize\@noticestring%
-  \end@float%
-}
+% \newcommand{\@noticestring}{Last update : \today.}
+% \newcommand{\ftype@noticebox}{8}
+% \newcommand{\@notice}{%
+%   \enlargethispage{2\baselineskip}%
+%   \@float{noticebox}[b]%
+%     \footnotesize\@noticestring%
+%   \end@float%
+% }
 
 % Abstract styling
 \renewenvironment{abstract}%
