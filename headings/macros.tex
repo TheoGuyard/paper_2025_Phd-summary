@@ -17,8 +17,6 @@
 \newcommand{\dv}{\mathbf{\dvletter}}
 \newcommand{\dvi}[1]{\dvletter_{#1}}
 
-% Sets
-
 % Problem data
 \newcommand{\pdim}{n}
 \newcommand{\lfunc}{f}
@@ -28,13 +26,14 @@
 \newcommand{\reg}{\lambda}
 \newcommand{\pslope}{\tau}
 \newcommand{\plimit}{\mu}
+\newcommand{\relaxrfunc}{\tilde{g}}
 
 % Indices
 \newcommand{\idxentry}{i}
 
 % BnB
-\newcommand{\LB}[1]{\check{#1}}
-\newcommand{\UB}[1]{\hat{#1}}
+\newcommand{\LB}[1]{#1_{\text{lb}}}
+\newcommand{\UB}[1]{#1_{\text{ub}}}
 \newcommand{\nodesymbol}{\nu}
 \newcommand{\node}[1]{#1^\nodesymbol}
 \newcommand{\childzero}[2]{#1_{#2,0}}
@@ -43,11 +42,18 @@
 \newcommand{\setzero}{\setidx_0}
 \newcommand{\setone}{\setidx_1}
 \newcommand{\setnone}{\setidx_\bullet}
-\newcommand{\pivotzero}[1]{\Delta_{#1,0}}
-\newcommand{\pivotone}[1]{\Delta_{#1,1}}
+\newcommand{\bigL}{\boldsymbol{\alpha}}
+\newcommand{\bigU}{\boldsymbol{\beta}}
 
-\newcommand{\ggfunc}{\Omega}
-\newcommand{\gpfunc}{\omega}
+
+% Experiments
+\newcommand{\density}{\rho}
+\newcommand{\ddim}{m}
+\newcommand{\groundtruth}{\opt{\pv}}
+\newcommand{\dic}{\mathbf{A}}
+\newcommand{\obs}{\mathbf{y}}
+\newcommand{\noise}{\boldsymbol{\epsilon}}
+\newcommand{\noisestd}{\sigma}
 
 
 % Math operators

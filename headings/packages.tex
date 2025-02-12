@@ -2,6 +2,9 @@
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 
+% Geometry
+\usepackage[margin=1in]{geometry}
+
 % Colors
 \usepackage[dvipsnames]{xcolor}
 \definecolor{mycolor}{RGB}{41,128,185}
@@ -35,6 +38,16 @@
 \usepackage{pgfplots}
 \pgfplotsset{compat=newest}
 \usepackage[ruled]{algorithm2e}
+\usepgfplotslibrary{groupplots}
+\pgfplotsset{
+ 	legend image code/.code={
+		\draw[mark repeat=2,mark phase=2] plot coordinates {
+			(0cm,0cm)
+			(0.25cm,0cm)
+			(0.25cm,0cm)
+		};
+    }
+}
 
 % Bibliography
 \usepackage[numbers,sort]{natbib}
@@ -54,3 +67,11 @@
 % Crefnames
 \crefname{assumption}{assumption}{assumptions}
 \Crefname{assumption}{Assumption}{Assumptions}
+
+% Colors
+\definecolor{cplexcolor}{RGB}{46,106,255}
+\definecolor{mosekcolor}{RGB}{69,152,62}
+\definecolor{gurobicolor}{RGB}{172,226,42}
+\definecolor{oacolor}{RGB}{172,226,42}
+\definecolor{l0bnbcolor}{RGB}{242,112,40}
+\definecolor{el0pscolor}{RGB}{187,0,0}

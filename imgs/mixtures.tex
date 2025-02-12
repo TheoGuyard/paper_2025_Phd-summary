@@ -1,0 +1,86 @@
+\pgfplotscreateplotcyclelist{cycle_list_mixtures}{
+    cplexcolor, smooth, very thick\\    
+    mosekcolor, smooth, very thick\\
+    oacolor, smooth, very thick\\
+    l0bnbcolor, smooth, very thick\\
+    el0pscolor, smooth, very thick\\
+}
+
+\begin{tikzpicture}
+    \begin{groupplot}[
+        group style     = {
+            group size      = 4 by 1,
+            horizontal sep  = 40pt,
+            ylabels at      = edge left,
+        },
+        height          = 4.0cm,
+        width           = 4.2cm,
+        ytick pos       = left,
+        xtick pos       = bottom,
+        grid            = major,
+        xlabel          = Solve time (sec.),
+        xmode           = log,
+        ylabel          = Instances solved,
+        ytick           = {0,25,50,75,100},
+        yticklabel      = {\pgfmathparse{\tick}\pgfmathprintnumber{\pgfmathresult}\%},
+        ymin            = -10,
+        ymax            = 110,
+        xmax            = 2000,
+        xmin            = 0.005,
+        cycle list name = cycle_list_mixtures,
+    ]
+
+        % -------------
+        % gaussian
+        % -------------    
+
+        \nextgroupplot[title = Gaussian]
+        \foreach \solver in {cplex,mosek,mosek_oa,l0bnb,el0ps}{
+            \addplot table[
+                x       = tgrid, 
+                y       = \solver,
+                col sep = comma,
+            ] {imgs/mixtures-k=10-m=500-n=1000-r=0.90-s=10.00-distrib=gaussian-scale=1.csv};
+            \label{plot:\solver}
+        }
+
+        % ----------------
+        % gaussian-laplace
+        % ----------------
+
+        \nextgroupplot[title = Gauss-Laplace]
+        \foreach \solver in {cplex,mosek,mosek_oa,l0bnb,el0ps}{
+            \addplot table[
+                x       = tgrid, 
+                y       = \solver,
+                col sep = comma,
+            ] {imgs/mixtures-k=10-m=500-n=1000-r=0.90-s=10.00-distrib=gauss-laplace-scale1=1-scale2=1.csv};
+        }
+
+        % -------------
+        % half-gaussian
+        % -------------
+
+        \nextgroupplot[title = Half-Normal]
+        \foreach \solver in {cplex,mosek,mosek_oa,l0bnb,el0ps}{
+            \addplot table[
+                x       = tgrid, 
+                y       = \solver,
+                col sep = comma,
+            ] {imgs/mixtures-k=10-m=500-n=1000-r=0.90-s=10.00-distrib=half-gaussian-scale=1.csv};
+        }
+
+        % -------------
+        % exponential
+        % -------------
+
+        \nextgroupplot[title = Exponential]
+        \foreach \solver in {cplex,mosek,mosek_oa,l0bnb,el0ps}{
+            \addplot table[
+                x       = tgrid, 
+                y       = \solver,
+                col sep = comma,
+            ] {imgs/mixtures-k=10-m=500-n=1000-r=0.90-s=10.00-distrib=exponential-scale=1.csv};
+        }
+    \end{groupplot}
+\end{tikzpicture}
