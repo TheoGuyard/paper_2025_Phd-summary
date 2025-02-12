@@ -198,7 +198,7 @@ Numerical experiments outline that \texttt{El0ps} achieves state-of-the-art perf
 \label{sec:numerics}
 
 \Cref{fig:perfprofiles} gives a glimpse of the implications of the manuscript's contributions for signal processing applications.
-Here, we address Bernoulli-Mixture reconstruction problems \cite{soussen2011bernoulli} aiming to recover a sparse signal $\groundtruth \in \kR^{1000}$ with non-zero entry density $\density=0.01$ from a linear measurement $\obs = \dic\groundtruth + \noise$, where $\dic \in \kR^{500 \times 100}$ is a known matrix and $\noise \sim \mathcal{N}(\0,\noisestd^2 \mathbf{I})$ is a Gaussian noise with 10dB Signal-to-Noise Ratio.
+Here, we address Bernoulli-Mixture reconstruction problems \cite{soussen2011bernoulli} aiming to recover a sparse signal $\groundtruth \in \kR^{1000}$ with non-zero entry density $\density=0.01$ from a linear measurement $\obs = \dic\groundtruth + \noise$, where $\dic \in \kR^{500 \times 1000}$ is a known matrix and $\noise \sim \mathcal{N}(\0,\noisestd^2 \mathbf{I})$ is a Gaussian noise with 10dB Signal-to-Noise ratio.
 The Maximum A Posteriori estimator of this sparse signal corresponds to a solution of problem \eqref{prob:prob} with $\lfunc(\pv) = \frac{1}{2}\norm{\obs - \dic\pv}{2}^2$ and $\reg = \noisestd^2\log((1-\density)/\density)$.
 The expression of $\pfunc$ depends on the prior model of the amplitude distribution of non-zero entries in $\groundtruth$.
 In the experiment, we consider different distributions for these non-zero entries (Gaussian, Gauss-Laplace, Half-Gaussian, Exponential), generate 100 independent instances of the corresponding problem \eqref{prob:prob}, and represent the percentage solved within a given time budget for different solvers.
