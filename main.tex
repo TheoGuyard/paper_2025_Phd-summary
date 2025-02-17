@@ -37,17 +37,17 @@ The manuscript focuses on $\ell_0$-regularized optimization problems given by
     \textstyle
     \opt{\pobj} = \min_{\pv \in \kR^{\pdim}} \lfunc(\pv) + \underbrace{\reg\norm{\pv}{0} + \pfunc(\pv)}_{\rfunc(\pv)}
 \end{equation}
-where $\kfuncdef{\lfunc}{\kR^{\pdim}}{\kR \cup \{+\infty\}}$ is a loss function and $\kfuncdef{\rfunc}{\kR^{\pdim}}{\kR \cup \{+\infty\}}$ is a regularizer involving an $\ell_0$-norm with weight $\reg > 0$ to promote sparse solutions by counting the number of non-zeros in its argument, as well as another penalty term $\kfuncdef{\pfunc}{\kR^{\pdim}}{\kR \cup \{+\infty\}}$ used to promote other properties than sparsity.
-Although various heuristics have been proposed to tackle this problem \cite{tropp2010computational}, exact methods are of paramount interest for many applications in signal processing, machine learning, or statistics, among others fields \citep{tillmann2021cardinality,bertsimas2016best}.
+where $\kfuncdef{\lfunc}{\kR^{\pdim}}{\kR \cup \{+\infty\}}$ is a loss function and $\kfuncdef{\rfunc}{\kR^{\pdim}}{\kR \cup \{+\infty\}}$ is a regularization involving an $\ell_0$-norm with weight $\reg > 0$ to promote sparse solutions by counting the number of non-zeros in its argument, as well as another penalty term $\kfuncdef{\pfunc}{\kR^{\pdim}}{\kR \cup \{+\infty\}}$ used to promote other properties than sparsity.
+Although various heuristics have been proposed to tackle this problem \cite{tropp2010computational}, exact methods are of paramount interest for many applications in signal processing, machine learning, or statistics, among other fields \citep{tillmann2021cardinality,bertsimas2016best}.
 In this vein, state-of-the-art solvers are based on \gls{bnb} algorithms \citep{ben2022global,hazimeh2022sparse}.
-So far, they have been only designed for some particular instances of the problem and can still suffer from poor numerical performance on real-world data.
-With this in mind, the manuscript aims to:
+So far, they have only been designed for some particular instances of the problem and can still suffer from poor numerical performance on real-world data.
+In this view, the manuscript aims to:
 \begin{enumerate}[nosep, label=\arabic*.]
     \item Provide a unified \gls{bnb} algorithm to tackle problem \eqref{prob:prob} in a generic fashion,
     \item Propose novel acceleration strategies to improve its numerical efficiency,
     \item Design a convenient toolbox for practitioners.
 \end{enumerate} 
-From \Cref{sec:bnb,sec:contributions,sec:numerics}, we describe the main ingredients required to implement a \gls{bnb} algorithm tailored to problem \eqref{prob:prob}, outline the contributions presented in the manuscript, and give a glimpse of the implications stemming from this work for signal processing applications.
+From \Cref{sec:bnb,sec:contributions,sec:numerics}, we describe the main ingredients required to implement a \gls{bnb} algorithm tailored to problem \eqref{prob:prob}, outline the contributions presented in the manuscript, and give an overview of the implications stemming from this work for signal processing applications.
 
 
 \section{Branch-and-Bound Ingredients}
@@ -71,7 +71,7 @@ Stated otherwise, these regions are defined as
     \right\}
 \end{equation}
 from a partition $(\setzero,\setone,\setnone)$ of the index set $\{1,\dots,\pdim\}$.
-Starting with a region where $\setzero = \setone = \emptyset$ corresponding to the whole feasible space $\kR^{\pdim}$, the \gls{bnb} algorithm iteratively selects a new region to process, performs a \emph{pruning test}, and if no pruning decision can be taken, splits it into two new sub-regions by fixing a new index to zero or non-zero.
+Starting with a region where $\setzero = \setone = \emptyset$ corresponding to the whole feasible space $\kR^{\pdim}$, the \gls{bnb} algorithm iteratively selects a new region to process, performs a \emph{pruning test}, and if no pruning decision can be taken, splits it into two new subregions by fixing a new index to zero or non-zero.
 Once the entire feasible space has been explored, solutions to problem \eqref{prob:prob} can be extracted from the regions that have not been pruned during the search.
 The \gls{bnb} complexity depends on the total number of regions processed and the cost to evaluate a pruning test for a given region.
 
@@ -95,7 +95,7 @@ using some lower bound $\node{\LB{\pobj}} \leq \node{\pobj}$ and upper bound $\o
 Implementing the \gls{bnb} algorithm then amounts to devising strategies to compute these bounds, typically sought \emph{tight} and \emph{tractable} to ensure the numerical efficiency of the method.
 
 \paragraph{Bounds computation.}
-Various heuristic-based strategies have been proposed to obtain an upper bound $\opt{\UB{\pobj}} \geq \opt{\pobj}$ of good quality at a reasonable cost.
+Various heuristics-based strategies have been proposed to obtain an upper bound $\opt{\UB{\pobj}} \geq \opt{\pobj}$ of good quality at a reasonable cost.
 The crux of the \gls{bnb} algorithm mainly lies in the computation of a suitable lower bound $\node{\LB{\pobj}} \leq \node{\pobj}$ for each region explored.
 This can be achieved by solving a \emph{relaxation} of problem \eqref{prob:prob-node}, expressed as
 \begin{equation}
@@ -121,10 +121,10 @@ Indeed, one relaxation needs to be solved per region explored to evaluate the as
 Following some introductory parts, the manuscript presents contributions disseminated from Chapters 4 to 7 to address the \gls{bnb} algorithm limitations aforementioned.
 
 
-\paragraph{Unified BnB Framework.}
+\paragraph{Unified Branch-and-Bound Framework.}
 
 Chapter 4 proposes a unified \gls{bnb} framework to address \eqref{prob:prob} through a generic strategy for constructing the relaxation \eqref{prob:relax-node}.
-Specifically, we consider any function $\pfunc(\pv) = \sum_{\idxentry=1}^{\pdim}\separable{\pfunc}{\idxentry}(\pvi{\idxentry})$ separable into splitting terms $\{\separable{\pfunc}{\idxentry}\}_{\idxentry=1}^{\pdim}$ that are proper, closed, convex, even, supercoercive, and verify $\separable{\pfunc}{\idxentry} \geq \separable{\pfunc}{\idxentry}(0) = 0$ with $0 \in \interior\dom(\separable{\pfunc}{\idxentry})$.\footnote{Our results can be extended to cases where $\separable{\pfunc}{\idxentry}$ is only assumed coercive with $\separable{\pfunc}{\idxentry}(0) > -\infty$.}
+Specifically, we consider any function $\pfunc(\pv) = \sum_{\idxentry=1}^{\pdim}\separable{\pfunc}{\idxentry}(\pvi{\idxentry})$ separable into splitting terms $\{\separable{\pfunc}{\idxentry}\}_{\idxentry=1}^{\pdim}$ that are proper, closed, convex, even, super-coercive, and verify $\separable{\pfunc}{\idxentry} \geq \separable{\pfunc}{\idxentry}(0) = 0$ with $0 \in \interior\dom(\separable{\pfunc}{\idxentry})$.\footnote{Our results can be extended to cases where $\separable{\pfunc}{\idxentry}$ is only assumed coercive with $\separable{\pfunc}{\idxentry}(0) > -\infty$.}
 In this context, we show that the \emph{convex envelope} of the function $\rfunc$ over a region $\nodesymbol$ defined by \eqref{eq:region} can be expressed as
 \begin{equation}
     \node{\rfunc}(\pv) = \sum_{\idxentry=1}^{\pdim}\node{\separable{\rfunc}{\idxentry}}(\pvi{\idxentry})
@@ -154,7 +154,7 @@ More importantly, we show that for nested regions $\nodesymbol' \subseteq \nodes
     \dfunc^{\nodesymbol'}(\dv) = \node{\dfunc}(\dv) + \Delta_{\text{sp}}^{\nodesymbol'}(\dv)
 \end{equation}
 where $\kfuncdef{\Delta_{\text{sp}}^{\nodesymbol'}}{\kR^{\pdim}}{\kR \cup \{+\infty\}}$ can be evaluated in $\mathcal{O}(1)$.
-From a \emph{single} evaluation of $\node{\dfunc}(\dv)$ when processing the region $\nodesymbol$, we can then check \emph{simultaneously} several nested regions $\nodesymbol' \subseteq \nodesymbol$ against a pruning test through their dual bound $\dfunc^{\nodesymbol'}(\dv)$ obtained \emph{at virtually no cost} from \eqref{eq:dual-bound-nested}.
+From a \emph{single} evaluation of $\node{\dfunc}(\dv)$ when processing the region $\nodesymbol$, we can then \emph{simultaneously} check several nested regions $\nodesymbol' \subseteq \nodesymbol$ against a pruning test through their dual bound $\dfunc^{\nodesymbol'}(\dv)$ obtained \emph{at virtually no cost} from \eqref{eq:dual-bound-nested}.
 In contrast, the standard pruning strategy requires solving one relaxation per region processed.
 This shift of paradigm in the pruning process allows accelerating the \gls{bnb} algorithm up to several orders of magnitude in terms of solving time.
 
@@ -163,7 +163,7 @@ This shift of paradigm in the pruning process allows accelerating the \gls{bnb} 
 Chapter 6 focuses on the specific case where $\pfunc(\pv) = 0$ when $\bigL \leq \pv \leq \bigU$ for some $(\bigL,\bigU) \in \kR-^{\pdim} \times \kR+^{\pdim}$, and $\pfunc(\pv) = +\infty$ otherwise.
 These instances are of interest for various applications but lead to two conflicting imperatives: the bounds $(\bigL,\bigU)$ are usually required to have large entries in absolute value, but increasing their magnitude degrades the performance of the \gls{bnb} algorithm.
 To face this issue, we propose a \emph{bound tightening} strategy to refine the initial bounds $(\bigL, \bigU)$ during the \gls{bnb} algorithm.
-In a similar fashion to simultaneous pruning, we show that for a region of the form $\nodesymbol' = \nodesymbol \setminus \kset{\pv \in \kR^{\pdim}}{\bigL' \leq \pv \leq \bigU'}$ with $\bigL \leq \bigL' \leq \bigU' \leq \bigU$, we can perform the pruning test using a dual bound $\node{\LB{\pobj}}=\node{\dfunc}(\dv)$ verifying
+Similarly to simultaneous pruning, we show that for a region of the form $\nodesymbol' = \nodesymbol \setminus \kset{\pv \in \kR^{\pdim}}{\bigL' \leq \pv \leq \bigU'}$ with $\bigL \leq \bigL' \leq \bigU' \leq \bigU$, we can perform the pruning test using a dual bound $\node{\LB{\pobj}}=\node{\dfunc}(\dv)$ verifying
 \begin{equation}
     \label{eq:dual-bound-peeling}
     \dfunc^{\nodesymbol'}(\dv) = \node{\dfunc}(\dv) + \Delta_{\text{bt}}^{\nodesymbol'}(\dv)
@@ -186,9 +186,9 @@ While prior contributions have proposed \emph{screening tests} \cite{el2012safe}
 We combine these two complementary strategies to dynamically reduce the dimension and smooth the objective function of problem \eqref{prob:prob-convex} during its resolution process, which can results in a significant performance improvements.
 Under suitable assumptions, our method benefits from a \emph{super-linear} convergence rate, although only a \emph{(sub-)linear} convergence rates are typically achievable with problem \eqref{prob:prob-convex}.
 
-\paragraph{Practical Toobox.}
+\paragraph{Practical Toolbox.}
 The contributions presented in the manuscript are implemented in \texttt{El0ps},\footnote{\url{https://github.com/TheoGuyard/El0ps}} an open-source Python package providing convenient interfaces for problem \eqref{prob:prob}.
-It includes several build-in instances, but also offers the flexibility to create new ones.
+It includes several built-in instances, but also offers the flexibility to create new ones.
 Users are only required to specify some operators associated with the function $\lfunc$ and $\pfunc$.
 Once done, the \gls{bnb} solver provided by \texttt{El0ps} can automatically address the resulting instance of problem \eqref{prob:prob}.
 In contrast, other existing \gls{bnb} solvers are restricted to one particular instance.
@@ -199,14 +199,16 @@ Numerical experiments outline that \texttt{El0ps} achieves state-of-the-art perf
 
 \Cref{fig:perfprofiles} gives a glimpse of the implications of the manuscript's contributions for signal processing applications.
 Here, we address Bernoulli-Mixture reconstruction problems \cite{soussen2011bernoulli} aiming to recover a sparse signal $\groundtruth \in \kR^{1000}$ with non-zero entry density $\density=0.01$ from a linear measurement $\obs = \dic\groundtruth + \noise$, where $\dic \in \kR^{500 \times 1000}$ is a known matrix and $\noise \sim \mathcal{N}(\0,\noisestd^2 \mathbf{I})$ is a Gaussian noise with 10dB Signal-to-Noise ratio.
-The Maximum A Posteriori estimator of this sparse signal corresponds to a solution of problem \eqref{prob:prob} with $\lfunc(\pv) = \frac{1}{2}\norm{\obs - \dic\pv}{2}^2$ and $\reg = \noisestd^2\log((1-\density)/\density)$.
+The Maximum A Posteriori estimation of this sparse signal corresponds to a solution of problem \eqref{prob:prob} with $\lfunc(\pv) = \frac{1}{2}\norm{\obs - \dic\pv}{2}^2$ and $\reg = \noisestd^2\log((1-\density)/\density)$.
 The expression of $\pfunc$ depends on the prior model of the amplitude distribution of non-zero entries in $\groundtruth$.
-In the experiment, we consider different distributions for these non-zero entries (Gaussian, Gauss-Laplace, Half-Gaussian, Exponential), generate 100 independent instances of the corresponding problem \eqref{prob:prob}, and represent the percentage solved within a given time budget for different solvers.
+In the experiment, we consider different distributions for these non-zero entries (Normal, Gauss-Laplace, Half-Normal, Exponential), generate 100 independent instances of the corresponding problem \eqref{prob:prob}, and represent the percentage solved within a given time budget for different solvers.
 Compared with generic optimization solvers such as \texttt{Cplex} and \texttt{Mosek} \cite{kronqvist2019review}, but also to solution methods specifically designed for problem \eqref{prob:prob} such as \texttt{L0bnb} \cite{hazimeh2022sparse} and \texttt{OA} \cite{bertsimas2021unified}, our solver \texttt{El0ps} largely outperforms its competitors and can handle a broader variety of instances.
+For instance, it is the only one able to process instances corresponding to the Exponential distribution.
 
 \begin{figure}[!ht]
     \centering
     \input{imgs/mixtures.tex}
+    \vspace*{-0.5cm}
     \caption{Instances solved for a given time budget using: \ref{plot:cplex} \texttt{Cplex}, \ref{plot:mosek} \texttt{Mosek}, \ref{plot:mosek_oa} \texttt{OA}, \ref{plot:l0bnb} \texttt{L0bnb}, \ref{plot:el0ps} \texttt{El0ps}. The absence of a curve indicates that the solver was unable to process the corresponding problem instance.}
     \label{fig:perfprofiles}
 \end{figure}
