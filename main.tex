@@ -53,10 +53,10 @@ From \Cref{sec:bnb,sec:contributions,sec:numerics}, we describe the main ingredi
 \section{Branch-and-Bound Ingredients}
 \label{sec:bnb}
 
-A \gls{bnb} algorithm is a general paradigm to address optimization problems.
+\gls{bnb} is a generic algorithm to address optimization problems.
 It explores \emph{regions} in the feasible space and \emph{prunes} those that cannot contain solutions.
-When applied to problem \eqref{prob:prob}, regions are constructed by driving the sparsity of the optimization variable, that is, by fixing some entries to zero or non-zero.
-Stated otherwise, these regions are defined as
+When specialized to problem \eqref{prob:prob}, the construction of regions is driven by the sparsity of the optimization variable, that is, by the fixing some entries to zero or non-zero.
+Stated otherwise, regions are defined as
 \begin{equation}
     \label{eq:region}
     \nodesymbol = \left\{
@@ -71,7 +71,7 @@ Stated otherwise, these regions are defined as
     \right\}
 \end{equation}
 from a partition $(\setzero,\setone,\setnone)$ of the index set $\{1,\dots,\pdim\}$.
-Starting with a region where $\setzero = \setone = \emptyset$ corresponding to the whole feasible space $\kR^{\pdim}$, the \gls{bnb} algorithm iteratively selects a new region to process, performs a \emph{pruning test}, and if no pruning decision can be taken, splits it into two new subregions by fixing a new index to zero or non-zero.
+Starting with a region resulting from the partition $(\emptyset,\emptyset,\{1,\dots,\pdim\})$ which corresponds to the whole feasible space $\kR^{\pdim}$, the \gls{bnb} algorithm iteratively selects a new region to process, performs a \emph{pruning test}, and if no pruning decision can be taken, splits it into two new subregions by fixing a new index to zero or non-zero.
 Once the entire feasible space has been explored, solutions to problem \eqref{prob:prob} can be extracted from the regions that have not been pruned during the search.
 The \gls{bnb} complexity depends on the total number of regions processed and the cost to evaluate a pruning test for a given region.
 
@@ -118,7 +118,8 @@ Indeed, one relaxation needs to be solved per region explored to evaluate the as
 \section{Contributions}
 \label{sec:contributions}
 
-Following some introductory parts, the manuscript presents contributions disseminated from Chapters 4 to 7 to address the \gls{bnb} algorithm limitations aforementioned.
+The manuscript presents contributions disseminated from Chapters 4 to 7 to address the \gls{bnb} algorithm limitations aforementioned.
+In the following, we outline the main results of each chapter.
 
 
 \paragraph{Unified Branch-and-Bound Framework.}
@@ -183,8 +184,8 @@ Chapter 7 proposes an acceleration strategy for numerical procedures tailored to
 \end{equation}
 where $\relaxrfunc$ promotes sparse solutions, which are ubiquitous in the literature.
 While prior contributions have proposed \emph{screening tests} \cite{el2012safe} to detect the position of zero entries in the problem solutions, we propose \emph{smoothing tests} to detect the position of non-zero entries.
-We combine these two complementary strategies to dynamically reduce the dimension and smooth the objective function of problem \eqref{prob:prob-convex} during its resolution process, which can results in a significant performance improvements.
-Under suitable assumptions, our method benefits from a \emph{super-linear} convergence rate, although only a \emph{(sub-)linear} convergence rates are typically achievable with problem \eqref{prob:prob-convex}.
+We combine these two complementary strategies to dynamically reduce the dimension and smooth the objective function of problem \eqref{prob:prob-convex} during its resolution process.
+When interleaved within standard optimization procedures such as proximal gradient, coordinate descent, or ADMM, this results in performance improvements up to several orders of magnitude in terms of solving time.
 
 \paragraph{Practical Toolbox.}
 The contributions presented in the manuscript are implemented in \texttt{El0ps},\footnote{\url{https://github.com/TheoGuyard/El0ps}} an open-source Python package providing convenient interfaces for problem \eqref{prob:prob}.
@@ -198,12 +199,12 @@ Numerical experiments outline that \texttt{El0ps} achieves state-of-the-art perf
 \label{sec:numerics}
 
 \Cref{fig:perfprofiles} gives a glimpse of the implications of the manuscript's contributions for signal processing applications.
-Here, we address Bernoulli-Mixture reconstruction problems \cite{soussen2011bernoulli} aiming to recover a sparse signal $\groundtruth \in \kR^{1000}$ with non-zero entry density $\density=0.01$ from a linear measurement $\obs = \dic\groundtruth + \noise$, where $\dic \in \kR^{500 \times 1000}$ is a known matrix and $\noise \sim \mathcal{N}(\0,\noisestd^2 \mathbf{I})$ is a Gaussian noise with 10dB Signal-to-Noise ratio.
-The Maximum A Posteriori estimation of this sparse signal corresponds to a solution of problem \eqref{prob:prob} with $\lfunc(\pv) = \frac{1}{2}\norm{\obs - \dic\pv}{2}^2$ and $\reg = \noisestd^2\log((1-\density)/\density)$.
-The expression of $\pfunc$ depends on the prior model of the amplitude distribution of non-zero entries in $\groundtruth$.
-In the experiment, we consider different distributions for these non-zero entries (Normal, Gauss-Laplace, Half-Normal, Exponential), generate 100 independent instances of the corresponding problem \eqref{prob:prob}, and represent the percentage solved within a given time budget for different solvers.
-Compared with generic optimization solvers such as \texttt{Cplex} and \texttt{Mosek} \cite{kronqvist2019review}, but also to solution methods specifically designed for problem \eqref{prob:prob} such as \texttt{L0bnb} \cite{hazimeh2022sparse} and \texttt{OA} \cite{bertsimas2021unified}, our solver \texttt{El0ps} largely outperforms its competitors and can handle a broader variety of instances.
-For instance, it is the only one able to process instances corresponding to the Exponential distribution.
+Here, we consider Bernoulli-Mixture reconstruction problems \cite{soussen2011bernoulli} aiming to recover a sparse signal $\groundtruth \in \kR^{1000}$ with entries verifying $\groundtruthi{\idxentry} \sim \mathcal{D}$ with probability $\density \in [0,1]$ for some distribution $\mathcal{D}$, and $\groundtruthi{\idxentry}=0$ otherwise. 
+To this end, we have access to a linear measurement $\obs = \dic\groundtruth + \noise$ where $\dic \in \kR^{500 \times 1000}$ is a known matrix and $\noise \sim \mathcal{N}(\0,\noisestd^2 \mathbf{I})$ is a noise with 10dB signal-to-noise ratio.
+In this setup, the Maximum A Posteriori estimation of the sparse signal corresponds to any solution of problem \eqref{prob:prob} with loss $\lfunc(\pv) = \frac{1}{2}\norm{\obs - \dic\pv}{2}^2$, parameter $\reg = \noisestd^2\log((1-\density)/\density)$, and penalty term $\pfunc$ whose expression depends on the distribution $\mathcal{D}$.
+In the experiment, we select different choices of distributions (Normal, Gauss-Laplace, Half-Normal, Exponential), generate 100 independent instances of the corresponding problem \eqref{prob:prob}, and represent the percentage solved within a given time budget for different solvers.
+Compared to generic optimization solvers such as \texttt{Cplex} and \texttt{Mosek} \cite{kronqvist2019review}, but also to solution methods specifically designed for problem \eqref{prob:prob} such as \texttt{L0bnb} \cite{hazimeh2022sparse} and \texttt{OA} \cite{bertsimas2021unified}, our solver \texttt{El0ps} obtains the best performances and can also handle a broader variety of instances.
+It is the only one able to process cases corresponding to the Exponential distribution.
 
 \begin{figure}[!ht]
     \centering
