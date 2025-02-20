@@ -199,19 +199,24 @@ Numerical experiments outline that \texttt{El0ps} achieves state-of-the-art perf
 \label{sec:numerics}
 
 \Cref{fig:perfprofiles} gives a glimpse of the implications of the manuscript's contributions for signal processing applications.
-Here, we consider Bernoulli-Mixture reconstruction problems \cite{soussen2011bernoulli} aiming to recover a sparse signal $\groundtruth \in \kR^{1000}$ with entries verifying $\groundtruthi{\idxentry} \sim \mathcal{D}$ with probability $\density \in [0,1]$ for some distribution $\mathcal{D}$, and $\groundtruthi{\idxentry}=0$ otherwise. 
-To this end, we have access to a linear measurement $\obs = \dic\groundtruth + \noise$ where $\dic \in \kR^{500 \times 1000}$ is a known matrix and $\noise \sim \mathcal{N}(\0,\noisestd^2 \mathbf{I})$ is a noise with 10dB signal-to-noise ratio.
-In this setup, the Maximum A Posteriori estimation of the sparse signal corresponds to any solution of problem \eqref{prob:prob} with loss $\lfunc(\pv) = \frac{1}{2}\norm{\obs - \dic\pv}{2}^2$, parameter $\reg = \noisestd^2\log((1-\density)/\density)$, and penalty term $\pfunc$ whose expression depends on the distribution $\mathcal{D}$.
-In the experiment, we select different choices of distributions (Normal, Gauss-Laplace, Half-Normal, Exponential), generate 100 independent instances of the corresponding problem \eqref{prob:prob}, and represent the percentage solved within a given time budget for different solvers.
-Compared to generic optimization solvers such as \texttt{Cplex} and \texttt{Mosek} \cite{kronqvist2019review}, but also to solution methods specifically designed for problem \eqref{prob:prob} such as \texttt{L0bnb} \cite{hazimeh2022sparse} and \texttt{OA} \cite{bertsimas2021unified}, our solver \texttt{El0ps} obtains the best performances and can also handle a broader variety of instances.
-It is the only one able to process cases corresponding to the Exponential distribution.
+Here, we consider Bernoulli-Mixture problems \cite{soussen2011bernoulli} aiming to reconstruct a sparse signal $\groundtruth \in \kR^{1000}$ known to verify $\groundtruthi{\idxentry} \sim \mathcal{D}$ with probability $\density = 0.01$ for some distribution $\mathcal{D}$, and $\groundtruthi{\idxentry}=0$ otherwise. 
+To this end, we have access to a linear measurement $\obs = \dic\groundtruth + \noise$ where $\dic \in \kR^{500 \times 1000}$ is a given matrix and $\noise \sim \mathcal{N}(\0,\noisestd^2 \mathbf{I})$ is a noise with 10dB signal-to-noise ratio.
+In this setup, the Maximum A Posteriori estimation of the sparse signal corresponds to any solution of problem \eqref{prob:prob} with
+a loss $\lfunc(\pv) = \frac{1}{2}\norm{\obs - \dic\pv}{2}^2$,
+a parameter $\reg = \noisestd^2\log((1-\density)/\density)$,
+and a penalty $\pfunc$ whose expression depends on the distribution $\mathcal{D}$.
+To conduct our experiment, we select different choices of distributions (Normal, Gauss-Laplace, Half-Normal, Exponential), independently generate 100 instances of the corresponding problem \eqref{prob:prob}, and represent the percentage solved within a given time budget using different numerical procedures.
+Compared to generic optimization solvers such as \texttt{Cplex} and \texttt{Mosek} \cite{kronqvist2019review}, but also to solution methods specifically designed for problem \eqref{prob:prob} such as \texttt{L0bnb} \cite{hazimeh2022sparse} and \texttt{OA} \cite{bertsimas2021unified}, our solver \texttt{El0ps} obtains the best performances and can also handle a broader variety of instances. 
+For instance, it is the only method able to process cases corresponding to the Exponential distribution.
 
 \begin{figure}[!ht]
+    \vspace*{-0.25cm}
     \centering
     \input{imgs/mixtures.tex}
     \vspace*{-0.5cm}
     \caption{Instances solved for a given time budget using: \ref{plot:cplex} \texttt{Cplex}, \ref{plot:mosek} \texttt{Mosek}, \ref{plot:mosek_oa} \texttt{OA}, \ref{plot:l0bnb} \texttt{L0bnb}, \ref{plot:el0ps} \texttt{El0ps}. The absence of a curve indicates that the solver was unable to process the corresponding problem instance.}
     \label{fig:perfprofiles}
+    \vspace*{-0.25cm}
 \end{figure}
 
 
