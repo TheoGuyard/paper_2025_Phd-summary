@@ -125,7 +125,7 @@ In the following, we outline the main results of each chapter.
 \paragraph{Unified Branch-and-Bound Framework.}
 
 Chapter 4 proposes a unified \gls{bnb} framework to address \eqref{prob:prob} through a generic strategy for constructing the relaxation \eqref{prob:relax-node}.
-Specifically, we consider any function $\pfunc(\pv) = \sum_{\idxentry=1}^{\pdim}\separable{\pfunc}{\idxentry}(\pvi{\idxentry})$ separable into splitting terms $\{\separable{\pfunc}{\idxentry}\}_{\idxentry=1}^{\pdim}$ that are proper, closed, convex, even, super-coercive, and verify $\separable{\pfunc}{\idxentry} \geq \separable{\pfunc}{\idxentry}(0) = 0$ with $0 \in \interior\dom(\separable{\pfunc}{\idxentry})$.\footnote{Our results can be extended to cases where $\separable{\pfunc}{\idxentry}$ is only assumed coercive with $\separable{\pfunc}{\idxentry}(0) > -\infty$.}
+Specifically, we consider any function $\pfunc(\pv) = \sum_{\idxentry=1}^{\pdim}\separable{\pfunc}{\idxentry}(\pvi{\idxentry})$ separable into splitting terms $\{\separable{\pfunc}{\idxentry}\}_{\idxentry=1}^{\pdim}$ that are proper, closed, convex, even, super-coercive, and verify $\separable{\pfunc}{\idxentry} \geq \separable{\pfunc}{\idxentry}(0) = 0$ with $0 \in \interior\dom(\separable{\pfunc}{\idxentry})$.\footnote{Our results can be extended to cases where $\separable{\pfunc}{\idxentry}$ is only assumed coercive with $\separable{\pfunc}{\idxentry}(0) \in \kR$.}
 In this context, we show that the \emph{convex envelope} of the function $\rfunc$ over a region $\nodesymbol$ defined by \eqref{eq:region} can be expressed as
 \begin{equation}
     \node{\rfunc}(\pv) = \sum_{\idxentry=1}^{\pdim}\node{\separable{\rfunc}{\idxentry}}(\pvi{\idxentry})
@@ -199,12 +199,12 @@ Numerical experiments outline that \texttt{El0ps} achieves state-of-the-art perf
 \label{sec:numerics}
 
 \Cref{fig:perfprofiles} gives a glimpse of the implications of the manuscript's contributions for signal processing applications.
-Here, we consider Bernoulli-Mixture problems \cite{soussen2011bernoulli} aiming to reconstruct a sparse signal $\groundtruth \in \kR^{1000}$ known to verify $\groundtruthi{\idxentry} \sim \mathcal{D}$ with probability $\density = 0.01$ for some distribution $\mathcal{D}$, and $\groundtruthi{\idxentry}=0$ otherwise. 
+Here, we consider Bernoulli-Mixture inverse problems \cite{soussen2011bernoulli} aiming to reconstruct a sparse signal $\groundtruth \in \kR^{1000}$ known to verify $\groundtruthi{\idxentry} \sim \mathcal{D}$ with probability $\density = 0.01$ for some distribution $\mathcal{D}$, and $\groundtruthi{\idxentry}=0$ otherwise. 
 To this end, we have access to a linear measurement $\obs = \dic\groundtruth + \noise$ where $\dic \in \kR^{500 \times 1000}$ is a given matrix and $\noise \sim \mathcal{N}(\0,\noisestd^2 \mathbf{I})$ is a noise with 10dB signal-to-noise ratio.
 In this setup, the Maximum A Posteriori estimation of the sparse signal corresponds to any solution of problem \eqref{prob:prob} with
 a loss $\lfunc(\pv) = \frac{1}{2}\norm{\obs - \dic\pv}{2}^2$,
 a parameter $\reg = \noisestd^2\log((1-\density)/\density)$,
-and a penalty $\pfunc$ whose expression depends on the distribution $\mathcal{D}$.
+and a penalty $\pfunc$ whose expression depends on the underlying distribution $\mathcal{D}$ of the non-zero entries.
 To conduct our experiment, we select different choices of distributions (Normal, Gauss-Laplace, Half-Normal, Exponential), independently generate 100 instances of the corresponding problem \eqref{prob:prob}, and represent the percentage solved within a given time budget using different numerical procedures.
 Compared to generic optimization solvers such as \texttt{Cplex} and \texttt{Mosek} \cite{kronqvist2019review}, but also to solution methods specifically designed for problem \eqref{prob:prob} such as \texttt{L0bnb} \cite{hazimeh2022sparse} and \texttt{OA} \cite{bertsimas2021unified}, our solver \texttt{El0ps} obtains the best performances and can also handle a broader variety of instances. 
 For instance, it is the only method able to process cases corresponding to the Exponential distribution.
