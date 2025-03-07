@@ -38,7 +38,7 @@ The manuscript focuses on $\ell_0$-regularized optimization problems given by
     \opt{\pobj} = \min_{\pv \in \kR^{\pdim}} \lfunc(\pv) + \underbrace{\reg\norm{\pv}{0} + \pfunc(\pv)}_{\rfunc(\pv)}
 \end{equation}
 where $\kfuncdef{\lfunc}{\kR^{\pdim}}{\kR \cup \{+\infty\}}$ is a loss function and $\kfuncdef{\rfunc}{\kR^{\pdim}}{\kR \cup \{+\infty\}}$ is a regularization involving an $\ell_0$-norm with weight $\reg > 0$ to promote sparse solutions by counting the number of non-zeros in its argument, as well as another penalty term $\kfuncdef{\pfunc}{\kR^{\pdim}}{\kR \cup \{+\infty\}}$ used to promote other properties than sparsity.
-Although various heuristics have been proposed to tackle this problem \cite{tropp2010computational}, exact methods are of paramount interest for many applications in signal processing, machine learning, or statistics, among other fields \citep{tillmann2021cardinality,bertsimas2016best}.
+Although various heuristics have been proposed to tackle this problem \cite{tropp2010computational}, exact methods are of paramount interest for many applications in signal processing, machine learning or statistics, among other fields \citep{tillmann2021cardinality,bertsimas2016best}.
 In this vein, state-of-the-art solvers are based on \gls{bnb} algorithms \citep{ben2022global,hazimeh2022sparse}.
 So far, they have only been designed for some particular instances of the problem and can still suffer from poor numerical performance on real-world data.
 In this view, the manuscript aims to:
@@ -55,7 +55,7 @@ From \Cref{sec:bnb,sec:contributions,sec:numerics}, we describe the main ingredi
 
 \gls{bnb} is a generic algorithm to address optimization problems.
 It explores \emph{regions} in the feasible space and \emph{prunes} those that cannot contain solutions.
-When specialized to problem \eqref{prob:prob}, the construction of regions is driven by the sparsity of the optimization variable, that is, by the fixing some entries to zero or non-zero.
+When specialized to problem \eqref{prob:prob}, the construction of regions is driven by the sparsity of the optimization variable, that is, by fixing some entries to zero or non-zero.
 Stated otherwise, regions are defined as
 \begin{equation}
     \label{eq:region}
@@ -76,7 +76,7 @@ Once the entire feasible space has been explored, solutions to problem \eqref{pr
 The \gls{bnb} complexity depends on the total number of regions processed and the cost to evaluate a pruning test for a given region.
 
 \paragraph{Pruning test.}
-The central mechanism of the \gls{bnb} algorithm is a pruning test which aims to detect regions that cannot contain any solution to problem \eqref{prob:prob}.
+The central mechanism of the \gls{bnb} algorithm is a pruning test that aims to detect regions that cannot contain any solution to problem \eqref{prob:prob}.
 Denoting 
 \begin{equation}
     \label{prob:prob-node}
@@ -109,7 +109,7 @@ One requires $\node{\rfunc}(\pv) \leq \rfunc(\pv)$ for all $\pv \in \nodesymbol$
 Moreover, one usually desires $\node{\rfunc}$ convex so that the relaxation \eqref{prob:relax-node} can be addressed efficiently via cutting-edge convex optimization methods.
 
 \paragraph{Limitations.}
-\gls{bnb} algorithms proposed so far in the literature suffer from two main limitations.
+Existing \gls{bnb} algorithms suffer from two main limitations.
 First, existing strategies to construct the function $\node{\rfunc}$ in the relaxation \eqref{prob:relax-node} are tied to the expression of the function $\pfunc$, thereby restricting the \gls{bnb} algorithm scope of application.
 Second, these \gls{bnb} algorithms can still suffer from poor performance on some real-world instances.
 Indeed, one relaxation needs to be solved per region explored to evaluate the associated pruning test, which can represent a significant computational burden.
@@ -224,34 +224,5 @@ For instance, it is the only method able to process cases corresponding to the E
     \small
     \bibliography{main}
 }
-
-
-\clearpage
-
-\thispagestyle{empty}
-
-\vspace*{150pt}
-\begin{center}
-    \LARGE\bf{Lettre de Candidature}
-\end{center}
-\vspace*{50pt}
-\begin{flushright}
-    À Rennes, le 16 décembre 2024
-\end{flushright}
-\vspace*{20pt}
-\textbf{Objet:} Candidature au prix de thèse du GRETSI 2025
-
-\vspace*{20pt}
-
-Par cette présente lettre, je souhaiterais soumettre ma candidature au prix de thèse 2025 du GRETSI pour mon manuscrit intitulé \textit{Branch-and-Bound Algorithms for L0-Regularized Optimization Problems} réalisé sous la direction de Cédric Herzet.
-Je certifie que les critères de recevabilité de ma candidature sont respectés et m'engage à fournir tous les documents nécessaires à l'examen de mon dossier.
-~\\
-
-Veuillez agréer, Madame, Monsieur, l'expression de mes salutations distinguées.
-
-\vspace*{50pt}
-\begin{flushright}
-    Théo Guyard
-\end{flushright}
 
 \end{document}
