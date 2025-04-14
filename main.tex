@@ -10,7 +10,7 @@
 % ------ Metadata ------ %
 
 \title{Summary of: Branch-and-Bound Algorithms for L0-Regularized Problems}
-\author{Théo Guyard \\ Inria, Centre de l'Université de Rennes \\ Insa Rennes, IRMAR -- CNRS UMR 6625 \\ \texttt{theo.guyard@insa-rennes.fr}}
+\author{Théo Guyard \\ INRIA, Centre de l'Université de Rennes, Rennes, France \\ INSA Rennes, IRMAR -- UMR CNRS 6625, Rennes France}
 \date{\today}
 
 % ------ Headings ------ %
@@ -30,24 +30,26 @@
 
 \maketitle
 
-The manuscript focuses on $\ell_0$-regularized optimization problems given by
+The manuscript focuses on $\ell_0$-regularized optimization problems expressed as
 \begin{equation}
     \label{prob:prob}
     \tag{$\ppb$}
     \textstyle
-    \opt{\pobj} = \min_{\pv \in \kR^{\pdim}} \lfunc(\pv) + \underbrace{\reg\norm{\pv}{0} + \pfunc(\pv)}_{\rfunc(\pv)}
+    \opt{\pobj} = \min_{\pv \in \kR^{\pdim}} \lfunc(\pv) + \rfunc(\pv)
+    \quad\text{with}\quad
+    \rfunc(\pv) = \reg\norm{\pv}{0} + \pfunc(\pv)
 \end{equation}
-where $\kfuncdef{\lfunc}{\kR^{\pdim}}{\kR \cup \{+\infty\}}$ is a loss function and $\kfuncdef{\rfunc}{\kR^{\pdim}}{\kR \cup \{+\infty\}}$ is a regularization involving an $\ell_0$-norm with weight $\reg > 0$ to promote sparse solutions by counting the number of non-zeros in its argument, as well as another penalty term $\kfuncdef{\pfunc}{\kR^{\pdim}}{\kR \cup \{+\infty\}}$ used to promote other properties than sparsity.
+where $\kfuncdef{\lfunc}{\kR^{\pdim}}{\kR \cup \{+\infty\}}$ is a loss function and $\kfuncdef{\rfunc}{\kR^{\pdim}}{\kR \cup \{+\infty\}}$ is a regularization involving an $\ell_0$-norm defined as $\norm{\pv}{0} = \mathrm{card}{\kset{\idxentry}{\pvi{\idxentry} \neq 0}}$ with weight $\reg > 0$ which counts the number of non-zeros in its argument to promote sparse solutions, as well as another penalty term $\kfuncdef{\pfunc}{\kR^{\pdim}}{\kR \cup \{+\infty\}}$ used to promote other desired properties than sparsity.
 Although various heuristics have been proposed to tackle this problem \cite{tropp2010computational}, exact methods are of paramount interest for many applications in signal processing, machine learning or statistics, among other fields \citep{tillmann2021cardinality,bertsimas2016best}.
 In this vein, state-of-the-art solvers are based on \gls{bnb} algorithms \citep{ben2022global,hazimeh2022sparse}.
-So far, they have only been designed for some particular instances of the problem and can still suffer from poor numerical performance on real-world data.
-In this view, the manuscript aims to:
+So far, these methods have only been designed for instances of problem \eqref{prob:prob} with a specific expression of penalty $\pfunc$ and can still suffer from poor numerical performance on real-world data.
+With this in mind, the manuscript aims to:
 \begin{enumerate}[nosep, label=\arabic*.]
     \item Provide a unified \gls{bnb} algorithm to tackle problem \eqref{prob:prob} in a generic fashion,
-    \item Propose novel acceleration strategies to improve its numerical efficiency,
+    \item Propose novel acceleration strategies to improve the numerical efficiency of the \gls{bnb} algorithm,
     \item Design a convenient toolbox for practitioners.
 \end{enumerate} 
-From \Cref{sec:bnb,sec:contributions,sec:numerics}, we describe the main ingredients required to implement a \gls{bnb} algorithm tailored to problem \eqref{prob:prob}, outline the contributions presented in the manuscript, and give an overview of the implications stemming from this work for signal processing applications.
+From \Cref{sec:bnb,sec:contributions,sec:numerics}, we describe the main ingredients required to implement a \gls{bnb} algorithm tailored to problem \eqref{prob:prob}, outline the contributions presented in the manuscript, and give an overview of the implications stemming from this work for a selected application in signal processing.
 
 
 \section{Branch-and-Bound Ingredients}
@@ -198,25 +200,27 @@ Numerical experiments outline that \texttt{El0ps} achieves state-of-the-art perf
 \section{Numerical Illustration}
 \label{sec:numerics}
 
-\Cref{fig:perfprofiles} gives a glimpse of the implications of the manuscript's contributions for signal processing applications.
-Here, we consider Bernoulli-Mixture inverse problems \cite{soussen2011bernoulli} aiming to reconstruct a sparse signal $\groundtruth \in \kR^{1000}$ known to verify $\groundtruthi{\idxentry} \sim \mathcal{D}$ with probability $\density = 0.01$ for some distribution $\mathcal{D}$, and $\groundtruthi{\idxentry}=0$ otherwise. 
+\Cref{fig:perfprofiles} gives a glimpse of the implications of the manuscript's contributions for a selected application in signal processing.
+Here, we consider Bernoulli-Mixture inverse problems \cite{soussen2011bernoulli} aiming to reconstruct a sparse signal $\groundtruth \in \kR^{1000}$ sampled as $\groundtruthi{\idxentry} \sim \mathcal{D}$ with probability $\density = 0.01$ for some distribution $\mathcal{D}$, and fixed to $\groundtruthi{\idxentry}=0$ otherwise. 
 To this end, we have access to a linear measurement $\obs = \dic\groundtruth + \noise$ where $\dic \in \kR^{500 \times 1000}$ is a given matrix and $\noise \sim \mathcal{N}(\0,\noisestd^2 \mathbf{I})$ is a noise with 10dB signal-to-noise ratio.
 In this setup, the Maximum A Posteriori estimation of the sparse signal corresponds to any solution of problem \eqref{prob:prob} with
 a loss $\lfunc(\pv) = \frac{1}{2}\norm{\obs - \dic\pv}{2}^2$,
 a parameter $\reg = \noisestd^2\log((1-\density)/\density)$,
 and a penalty $\pfunc$ whose expression depends on the underlying distribution $\mathcal{D}$ of the non-zero entries.
-To conduct our experiment, we select different choices of distributions (Normal, Gauss-Laplace, Half-Normal, Exponential), independently generate 100 instances of the corresponding problem \eqref{prob:prob}, and represent the percentage solved within a given time budget using different numerical procedures.
-Compared to generic optimization solvers such as \texttt{Cplex} and \texttt{Mosek} \cite{kronqvist2019review}, but also to solution methods specifically designed for problem \eqref{prob:prob} such as \texttt{L0bnb} \cite{hazimeh2022sparse} and \texttt{OA} \cite{bertsimas2021unified}, our solver \texttt{El0ps} obtains the best performances and can also handle a broader variety of instances. 
-For instance, it is the only method able to process cases corresponding to the Exponential distribution.
+To conduct our experiment, we select different choices of distributions (Normal, Gauss-Laplace, Half-Normal, Exponential), generate 100 independent instances of the corresponding problem \eqref{prob:prob}, and represent the percentage solved within a given time budget using different numerical procedures.
+When compared to generic solvers such as \texttt{Cplex} and \texttt{Mosek} \cite{kronqvist2019review}, but also to solution methods specifically designed for problem \eqref{prob:prob} such as \texttt{L0bnb} \cite{hazimeh2022sparse} and \texttt{OA} \cite{bertsimas2021unified}, our proposed solver \texttt{El0ps} allows for more flexibility in the instances it can handle.
+Notably, it is the only method able to process instances associated with the Exponential distribution.
+Additionally, it largely outperforms its competitors in terms of numerical performance on instances that could already been addressed.
+
 
 \begin{figure}[!ht]
-    \vspace*{-0.25cm}
+    \vspace*{-0.3cm}
     \centering
     \input{imgs/mixtures.tex}
-    \vspace*{-0.5cm}
+    \vspace*{-0.75cm}
     \caption{Instances solved for a given time budget using: \ref{plot:cplex} \texttt{Cplex}, \ref{plot:mosek} \texttt{Mosek}, \ref{plot:mosek_oa} \texttt{OA}, \ref{plot:l0bnb} \texttt{L0bnb}, \ref{plot:el0ps} \texttt{El0ps}. The absence of a curve indicates that the solver was unable to process the corresponding problem instance.}
     \label{fig:perfprofiles}
-    \vspace*{-0.25cm}
+    \vspace*{-0.4cm}
 \end{figure}
 
 
